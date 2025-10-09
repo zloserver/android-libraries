@@ -1,0 +1,58 @@
+name: Build HevSocks5Tunnel
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'hevsocks5-*'
+
+jobs:
+  build-hevsocks5:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout HevSocks5Tunnel
+        uses: actions/checkout@v4
+        with:
+          repository: 'zloserver/hev-socks5-tunnel'
+          ref: 'master'
+          path: 'hevsocks5'
+          submodules: 'recursive'
+
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          ref: 'release'
+          path: 'release'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build HevSocks5Tunnel
+        run: |
+          cd hevsocks5
+          ./build-android.sh
+
+      - name: Copy library to release branch
+        run: |
+          rm -rf release/hevsocks5-*
+          cp hevsocks5/android/build/outputs/aar/* release/
+
+      - name: Push release branch
+        run: |
+          cd release
+          git config --global user.name "Github Actions"
+          git config --global user.email ""
+          git add .
+          git commit -m "HevSocks5Tunnel update"
+          git push
