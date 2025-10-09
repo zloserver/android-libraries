@@ -10,6 +10,13 @@ jobs:
   build-libxray:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Xray-core
+        uses: actions/checkout@v4
+        with:
+          repository: 'XTLS/Xray-core'
+          ref: 'v25.1.30'
+          path: 'Xray-core'
+
       - name: Checkout libXray
         uses: actions/checkout@v4
         with:
