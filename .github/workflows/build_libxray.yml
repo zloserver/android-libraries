@@ -40,15 +40,19 @@ jobs:
           go install golang.org/x/mobile/cmd/gomobile@latest
           gomobile init
 
+      - name: Setup Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.11
+
       - name: Build libXray
         run: |
           cd libXray
           python3 build/main.py android 24
 
-      - name: Copy framework to release branch
+      - name: Copy library to release branch
         run: |
-          rm -rf release/libXray.aar
-          cp libXray/libXray.aar release/
+          mvn install:install-file -Dfile=libXray/libXray.aar -DgroupId=com.zloserver.vpn.deps -DartifactId=libxray -Dversion=1.0.0 -Dpackaging=aar -DlocalRepositoryPath=release
 
       - name: Push release branch
         run: |
