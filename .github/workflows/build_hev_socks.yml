@@ -38,6 +38,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Setup Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.11
+
       - name: Build HevSocks5Tunnel
         run: |
           cd hevsocks5
@@ -45,8 +50,7 @@ jobs:
 
       - name: Copy library to release branch
         run: |
-          rm -rf release/hevsocks5-*
-          cp hevsocks5/android/build/outputs/aar/* release/
+          mvn install:install-file -Dfile=hevsocks5/android/build/outputs/aar/hevsocks5-android-release.aar -DgroupId=com.zloserver.vpn.deps -DartifactId=hevsocks5-android -Dversion=1.0.0 -Dpackaging=aar -DlocalRepositoryPath=release
 
       - name: Push release branch
         run: |
